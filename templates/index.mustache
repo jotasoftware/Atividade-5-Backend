@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formulário</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      line-height: 1.6;
+    }
+    .button {
+      display: inline-block;
+      padding: 10px 10px;
+      text-align: center;
+      text-decoration: none;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .button-container a,
+    .button-container button {
+      margin: 10px; 
+    }
+  </style>
+</head>
+<body>
+  <h1>Inicie uma sessão</h1>
+  <form action="/salvauser" method="POST">
+    <label for="name">Nome:</label>
+    <input type="text" id="name" name="name" required>
+    <button type="submit" class="button">Enviar</button>
+  </form>
+
+  <div class="button-container">
+    <a href="/random" class="button">Random</a>
+    <a href="/contador" class="button">Contador</a>
+    <a href="/todolist" class="button">To Do List</a>
+  </div>
+
+  {{#cookie}}
+    <p>Valor do cookie: {{cookie}}</p>
+  {{/cookie}}
+</body>
+</html>

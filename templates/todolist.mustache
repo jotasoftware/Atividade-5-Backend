@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atividade</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            padding: 10px;
+            margin: 5px 0;
+            background: #f4f4f4;
+            border: 1px solid #ccc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .close {
+            cursor: pointer;
+            color: red;
+        }
+    </style>
+
+</head>
+<body>
+    <h1>To-Do List</h1>
+    {{#session}}
+    <p>Olá, {{session}}!</p>
+        <form id="addTarefaForm">
+            <input id="inputTarefa" type="text" name="inputTarefa" placeholder="Nova Tarefa" required>
+            <button type="submit">Adicionar</button>
+        </form>
+    {{/session}}
+    <ul id="tarefas">
+        {{#tarefas}}
+        <li>{{.}} <span class="close">Apagar</span></li>
+        {{/tarefas}}
+    </ul>
+
+        <button id="btnApagarTudo">Apagar Todas as Tarefas</button>
+        <a href="/">Tela Inicial</a>
+</body>
+<script>
+   const btnApagarTudo = document.getElementById('btnApagarTudo');
+    const tarefasList = document.getElementById('tarefas');
+    const addTarefaForm = document.getElementById('addTarefaForm');
+    const inputTarefa = document.getElementById('inputTarefa');
+
+    addTarefaForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const novaTarefa = inputTarefa.value.trim();
+        if (!novaTarefa) return alert('Digite uma tarefa!');
+        
+        try {
+            await fetch('/adicionartarefa', {
+                method: 'POST',
+                body: new URLSearchParams({ inputTarefa: novaTarefa }),
+            });
+            location.reload();
+        } catch (error) {
+            console.error('Erro ao adicionar tarefa:', error);
+        }
+    })
+
+    tarefasList.addEventListener('click', async (e) => {
+        if (e.target.classList.contains('close')) {
+            const li = e.target.parentElement;
+            const index = Array.from(tarefasList.children).indexOf(li);
+
+            try {
+                const response = await fetch('/removertarefa', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ index }),
+                })
+
+                if (response.ok) {
+                    li.remove()
+                } else {
+                    console.error('Erro ao remover a tarefa:', response.statusText)
+                }
+            } catch (error) {
+                console.error('Erro ao enviar requisição:', error);
+            }
+        }
+    })
+
+    btnApagarTudo.addEventListener('click', async () => {
+        if (confirm('Tem certeza que deseja apagar todas as tarefas?')) {
+            try {
+                const response = await fetch('/apagarTudo', { method: 'DELETE' })
+                if (response.ok) {
+                    while (tarefasList.firstChild) {
+                        tarefasList.removeChild(tarefasList.firstChild);
+                    }
+                } else {
+                    console.error('Erro ao apagar todas as tarefas:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Erro ao enviar requisição:', error);
+            }
+        }
+    })
+
+</script>
+
+</html>
